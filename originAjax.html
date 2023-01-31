@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Document</title>
+</head>
+<body>
+
+      <!-- <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script> -->
+      <script type="text/javascript">
+            var xhr;
+
+            // 第一步：创建XMLHttpRequest对象
+            /**IE5/6的ajax使用的是ActiveXObject()，其他的都是使用XMLHttpRequest()
+             * 通过XMLHttpRequest()的实例对象中的方法和事件来完成发送和响应HTTP请求
+             * **/ 
+            if (window.XMLHttpRequest) {
+                  xhr = new XMLHttpRequest();
+            } else {
+                  xhr = new ActiveXObject('Microsoft.XMLHTTP');
+            }
+
+            console.log(xhr.readyState)  //0
+
+            // 第二步：配置请求并发送
+            // 配置发送前的设置
+            xhr.open('GET', 'http://localhost/network/class7/server/get_courses.php?status=1', true);
+            // 发送请求
+            xhr.send();
+
+            /*
+            xhr.open('POST', 'http://localhost/network/class7/server/get_courses.php?status=1', true);
+            // 添加请求头信息
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
+            // 发送给服务端的请求体数据必须写源码格式，而非对象模式。
+            xhr.send('status=1&flag=1');
+            */ 
+
+            console.log(xhr.readyState)  //1
+
+            // 第三步：监听请求的状态和响应的状态，最后获取相应的数据。
+            // 监听xhr的readystate状态和status状态
+            xhr.onreadystatechange = function () {
+                  if (xhr.readyState === 4 && xhr.status === 200) {
+                        console.log(xhr.readyState) // 2 3 4
+                        // 成功后将返回的字符串数据转换为JSON对象数据
+                        console.log(JSON.parse(xhr.responseText))
+                  }
+            }
+
+      </script>
+      
+</body>
+</html>

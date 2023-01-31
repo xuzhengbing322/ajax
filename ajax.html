@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Document</title>
+</head>
+
+<body>
+      <script type="text/javascript">
+            /*
+            $.ajax ({
+                        url: 'http://localhost/network/class7/server/get_courses.php?status=1',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: {
+                              status: 1
+                        },
+                        success: function (data) {
+                              console.log(data)
+                        }
+                  }) 
+      
+                  $.post ('http://localhost/network/class7/server/get_courses.php?status=1', 
+                        {status: 1}, function (data) {
+                              console.log(data)
+                        }
+                  )
+      
+                  $.get('http://localhost/network/class7/server/get_courses.php?status=1', 
+                        function (data) {
+                              console.log(data)
+                        })
+            */
+
+            // 方式一：命名空间的方式。老方式
+            // let $ = {
+            //       ajax: function (opt) {
+            //             url = opt.url;
+            //       },
+            //       post: function () {},
+            //       get: function () {}
+            // }
+
+            // 方式二：模块化的方式
+            let xhr = (function () {
+                  // 获取XMLHttpRequest()实例对象。
+                  let o = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+                  if (!o) {
+                        throw new Error('您的浏览器不支持异步发起HTTP请求。')
+                  }
+
+                  function _doAjax(opt) {
+                        // 默认为空对象
+                        let opt = opt || {},
+                              type = (opt.type || 'GET').toUpperCase(),
+                              async = opt.async || true,
+                              //必配项，没有的话会报错
+                              url = opt.url,
+                              //POST请求有请求体，GET请求没有请求体
+                              data = opt.data || null,
+                              // 请求失败执行的函数
+                              error = opt.error || function () { },
+                              // 请求成功执行的函数
+                              success = opt.success || function () { },
+                              // 无论请求是否成功都会执行的函数。
+                              complete = opt.complete | function () { };
+
+                        if (!url) {
+                              throw new Error('您没有填写URL');
+                        }
+
+                        // 设置请求配置
+                        o.open(type, url, async);
+                        // 如果是POST请求，则添加请求头
+                        type === 'POST' && o.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                        // 发送请求，GET请求没有参数，POST请求参数为字符串类型的数据
+                        o.send(type === 'GET' ? null : formatDatas(data))
+
+                        // 判断是否请求成功
+                        o.onreadystatechange = function () {
+                              if (o.readyState === 4 && o.status === 200) {
+                                    // o.responseText是服务器返回的字符串类型的数据
+                                    success(JSON.parse(o.responseText));
+                                    complete()
+                              }
+
+                              if (o.status === 404) {
+                                    error();
+                                    complete();
+                              }
+                        }
+                  }
+
+                  // 将键值对数据转化为字符串
+                  function formatDatas(obj) {
+                        let str = '';
+
+                        // 将{a: 1, b:2} => 'a=1&b=2&'
+                        for (let key in obj) {
+                              str += key + '=' + obj[key] + '&';
+                        }
+                        // 去掉结尾的&
+                        return str.replace(/&$/, '')
+                  }
+
+                  return {
+                        // opt参数对象
+                        ajax: function (opt) {
+                              // 通过函数传参的方式，将opt放到匿名函数中处理。内部执行外部的函数，即可将参数传到外部处理
+                              _doAjax(opt);
+                        },
+                        post: function (url, data, callback) {
+                              _doAjax({
+                                    type: 'POST',
+                                    url: url,
+                                    data: data,
+                                    success: callback
+                              })
+                        },
+                        get: function (url, callback) { 
+                              _doAjax({
+                                    type: 'GET',
+                                    url: url,
+                                    success: callback
+                              })
+                        }
+                  }
+            })()
+
+            // 不同$，避免和引入的jQuery冲突
+            xhr.ajax({
+                  type: 'POST',
+                  url: 'http://localhost/network/class7/server/get_courses.php?status=1',
+                  data: {
+                        status: 1,
+                        flag: 2
+                  },
+                  success: function (data) {
+                        console.log(data)
+                  }
+            })
+
+            xhr.post('http://localhost/network/class7/server/get_courses.php',
+                  { status: 1, flag: 2 }, function (data) {
+                        console.log(data)
+                  }
+            )
+
+            xhr.get('http://localhost/network/class7/server/get_courses.php?status=1&flag=2',
+                  function (data) {
+                        console.log(data)
+                  }
+            )
+      </script>
+</body>
+
+</html>
